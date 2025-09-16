@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nokia Message Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f8f8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background-color: #fafafa;
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .textarea-container {
+            position: relative;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 12px 35px 12px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #d0d0d0;
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .clear-btn:hover {
+            background-color: #f0f0f0;
+            color: #666;
+        }
+
+        .preview-section {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .preview-label {
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #555;
+            align-self: flex-start;
+        }
+
+        #previewCanvas {
+            max-width: 100%;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-primary:hover {
+            background-color: #e0e0e0;
+        }
+
+        .btn-secondary {
+            background-color: #e8e8e8;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d8d8d8;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 14px;
+            color: #777;
+            background-color: #fafafa;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Nokia Message Generator</h1>
+            <p>Create a classic Nokia phone message image</p>
+        </div>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="messageText">Enter your message:</label>
+                    <div class="textarea-container">
+                        <textarea id="messageText" class="text-input" placeholder="Type your message here...">raat ki neend se uth kar jo pehla glass pani peeo, uski tarhan ho</textarea>
+                        <button id="clearTextBtn" class="clear-btn"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="generateBtn" class="btn btn-primary">Generate Image</button>
+                    <button id="downloadBtn" class="btn btn-secondary">Download</button>
+                </div>
+            </div>
+            
+            <div class="preview-section">
+                <div class="preview-label">Preview:</div>
+                <canvas id="previewCanvas" width="200" height="420"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        Made with ❤️ by Sauravhhh
+    </div>
+    
+    <div id="notification" class="notification"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('previewCanvas');
+            const ctx = canvas.getContext('2d');
+            const messageInput = document.getElementById('messageText');
+            const generateBtn = document.getElementById('generateBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const clearTextBtn = document.getElementById('clearTextBtn');
+            const notification = document.getElementById('notification');
+            
+            // Generate initial preview
+            generateImage();
+            
+            // Event listeners
+            generateBtn.addEventListener('click', function() {
+                showNotification('Generating image...');
+                setTimeout(generateImage, 100);
+            });
+            
+            downloadBtn.addEventListener('click', downloadImage);
+            clearTextBtn.addEventListener('click', clearText);
+            
+            function clearText() {
+                messageInput.value = '';
+                generateImage();
+                showNotification('Text cleared');
+            }
+            
+            function generateImage() {
+                try {
+                    const message = messageInput.value || 'raat ki neend se uth kar jo pehla glass pani peeo, uski tarhan ho';
+                    
+                    // Clear canvas
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Draw phone body (dark gray)
+                    ctx.fillStyle = '#2a2a2a';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Draw phone border (darker)
+                    ctx.strokeStyle = '#1a1a1a';
+                    ctx.lineWidth = 3;
+                    ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
+                    
+                    // Draw screen background (green LCD)
+                    ctx.fillStyle = '#1a3a1a';
+                    ctx.fillRect(20, 30, canvas.width - 40, 200);
+                    
+                    // Draw screen border (dark gray)
+                    ctx.strokeStyle = '#0a0a0a';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(20, 30, canvas.width - 40, 200);
+                    
+                    // Draw status bar (darker green)
+                    ctx.fillStyle = '#0f2f0f';
+                    ctx.fillRect(20, 30, canvas.width - 40, 25);
+                    
+                    // Draw status bar text
+                    ctx.fillStyle = '#00ff00';
+                    ctx.font = '10px monospace';
+                    ctx.textAlign = 'left';
+                    ctx.fillText('Nokia', 30, 47);
+                    ctx.textAlign = 'right';
+                    ctx.fillText('10:30', canvas.width - 30, 47);
+                    
+                    // Draw message area (darker green)
+                    ctx.fillStyle = '#0f2f0f';
+                    ctx.fillRect(25, 60, canvas.width - 50, 140);
+                    
+                    // Draw message border
+                    ctx.strokeStyle = '#00ff00';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(25, 60, canvas.width - 50, 140);
+                    
+                    // Draw message text (green)
+                    ctx.fillStyle = '#00ff00';
+                    ctx.font = '10px monospace';
+                    ctx.textAlign = 'left';
+                    
+                    // Word wrap for long text
+                    const maxWidth = canvas.width - 60;
+                    const lineHeight = 14;
+                    let y = 75;
+                    
+                    const words = message.split(' ');
+                    let line = '';
+                    
+                    for (let i = 0; i < words.length; i++) {
+                        const testLine = line + words[i] + ' ';
+                        const metrics = ctx.measureText(testLine);
+                        const testWidth = metrics.width;
+                        
+                        if (testWidth > maxWidth && i > 0) {
+                            ctx.fillText(line, 35, y);
+                            line = words[i] + ' ';
+                            y += lineHeight;
+                            
+                            // Stop if we run out of space
+                            if (y > 185) {
+                                ctx.fillText(line + '...', 35, y);
+                                break;
+                            }
+                        } else {
+                            line = testLine;
+                        }
+                    }
+                    
+                    if (y <= 185) {
+                        ctx.fillText(line, 35, y);
+                    }
+                    
+                    // Draw input mode indicator
+                    ctx.fillStyle = '#00ff00';
+                    ctx.font = '8px monospace';
+                    ctx.textAlign = 'left';
+                    ctx.fillText('Abc', 35, 215);
+                    
+                    // Draw character count
+                    ctx.textAlign = 'right';
+                    ctx.fillText(`${message.length}/160`, canvas.width - 35, 215);
+                    
+                    // Draw soft keys (3D effect)
+                    // Left soft key
+                    ctx.fillStyle = '#3a3a3a';
+                    ctx.fillRect(25, 225, 70, 25);
+                    ctx.strokeStyle = '#1a1a1a';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(25, 225, 70, 25);
+                    
+                    // Right soft key
+                    ctx.fillStyle = '#3a3a3a';
+                    ctx.fillRect(canvas.width - 95, 225, 70, 25);
+                    ctx.strokeRect(canvas.width - 95, 225, 70, 25);
+                    
+                    // Draw soft key text
+                    ctx.fillStyle = '#00ff00';
+                    ctx.font = '8px monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Options', 60, 242);
+                    ctx.fillText('Clear', canvas.width - 60, 242);
+                    
+                    // Draw keypad with 3D effect
+                    const keyWidth = 50;
+                    const keyHeight = 35;
+                    const keySpacing = 4;
+                    const startX = 25;
+                    const startY = 260;
+                    
+                    // Keypad layout
+                    const keypad = [
+                        ['1', '2', '3'],
+                        ['4', '5', '6'],
+                        ['7', '8', '9'],
+                        ['*', '0', '#']
+                    ];
+                    
+                    for (let row = 0; row < keypad.length; row++) {
+                        for (let col = 0; col < keypad[row].length; col++) {
+                            const x = startX + col * (keyWidth + keySpacing);
+                            const y = startY + row * (keyHeight + keySpacing);
+                            
+                            // Draw key (3D effect)
+                            ctx.fillStyle = '#4a4a4a';
+                            ctx.fillRect(x, y, keyWidth, keyHeight);
+                            
+                            // Draw key border
+                            ctx.strokeStyle = '#2a2a2a';
+                            ctx.lineWidth = 1;
+                            ctx.strokeRect(x, y, keyWidth, keyHeight);
+                            
+                            // Draw key highlight (top-left)
+                            ctx.strokeStyle = '#6a6a6a';
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(x, y + keyHeight - 1);
+                            ctx.lineTo(x, y);
+                            ctx.lineTo(x + keyWidth - 1, y);
+                            ctx.stroke();
+                            
+                            // Draw key shadow (bottom-right)
+                            ctx.strokeStyle = '#1a1a1a';
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(x + 1, y + keyHeight);
+                            ctx.lineTo(x + keyWidth, y + keyHeight);
+                            ctx.lineTo(x + keyWidth, y + 1);
+                            ctx.stroke();
+                            
+                            // Draw key number
+                            ctx.fillStyle = '#ffffff';
+                            ctx.font = '14px monospace';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(keypad[row][col], x + keyWidth/2, y + keyHeight/2);
+                            
+                            // Draw letters on keys (2, 3, etc.)
+                            if (keypad[row][col] === '2') {
+                                ctx.font = '6px monospace';
+                                ctx.fillText('ABC', x + keyWidth/2, y + keyHeight/2 + 10);
+                            } else if (keypad[row][col] === '3') {
+                                ctx.font = '6px monospace';
+                                ctx.fillText('DEF', x + keyWidth/2, y + keyHeight/2 + 10);
+                            } else if (keypad[row][col] === '7') {
+                                ctx.font = '6px monospace';
+                                ctx.fillText('PQRS', x + keyWidth/2, y + keyHeight/2 + 10);
+                            }
+                        }
+                    }
+                    
+                    // Draw Nokia logo at bottom
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '8px monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('NOKIA', canvas.width/2, canvas.height - 15);
+                    
+                    showNotification('Image generated successfully!');
+                } catch (error) {
+                    console.error('Error generating image:', error);
+                    showNotification('Error generating image. Please try again.');
+                }
+            }
+            
+            function downloadImage() {
+                try {
+                    const link = document.createElement('a');
+                    link.download = 'nokia-message.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    
+                    showNotification('Image downloaded successfully!');
+                } catch (error) {
+                    console.error('Error downloading image:', error);
+                    showNotification('Error downloading image. Please try again.');
+                }
+            }
+            
+            function showNotification(message) {
+                notification.textContent = message;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
