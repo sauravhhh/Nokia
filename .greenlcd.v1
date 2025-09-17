@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nokia Green Notepad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f8f8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background-color: #fafafa;
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .textarea-container {
+            position: relative;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 12px 35px 12px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #d0d0d0;
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .clear-btn:hover {
+            background-color: #f0f0f0;
+            color: #666;
+        }
+
+        .preview-section {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .preview-label {
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #555;
+            align-self: flex-start;
+        }
+
+        #previewCanvas {
+            max-width: 100%;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-primary:hover {
+            background-color: #e0e0e0;
+        }
+
+        .btn-secondary {
+            background-color: #e8e8e8;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d8d8d8;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 14px;
+            color: #777;
+            background-color: #fafafa;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Nokia Green Notepad</h1>
+            <p>Create a notepad inspired by Nokia green LCD</p>
+        </div>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="noteText">Enter your note:</label>
+                    <div class="textarea-container">
+                        <textarea id="noteText" class="text-input" placeholder="Type your note here...">raat ki neend se uth kar jo pehla glass pani peeo, uski tarhan ho</textarea>
+                        <button id="clearTextBtn" class="clear-btn"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="generateBtn" class="btn btn-primary">Generate Image</button>
+                    <button id="downloadBtn" class="btn btn-secondary">Download</button>
+                </div>
+            </div>
+            
+            <div class="preview-section">
+                <div class="preview-label">Preview:</div>
+                <canvas id="previewCanvas" width="300" height="500"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        Made with ❤️ by Sauravhhh
+    </div>
+    
+    <div id="notification" class="notification"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('previewCanvas');
+            const ctx = canvas.getContext('2d');
+            const noteInput = document.getElementById('noteText');
+            const generateBtn = document.getElementById('generateBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const clearTextBtn = document.getElementById('clearTextBtn');
+            const notification = document.getElementById('notification');
+            
+            // Generate initial preview
+            generateImage();
+            
+            // Event listeners
+            generateBtn.addEventListener('click', function() {
+                showNotification('Generating image...');
+                setTimeout(generateImage, 100);
+            });
+            
+            downloadBtn.addEventListener('click', downloadImage);
+            clearTextBtn.addEventListener('click', clearText);
+            
+            function clearText() {
+                noteInput.value = '';
+                generateImage();
+                showNotification('Text cleared');
+            }
+            
+            function generateImage() {
+                try {
+                    const note = noteInput.value || 'raat ki neend se uth kar jo pehla glass pani peeo, uski tarhan ho';
+                    
+                    // Clear canvas
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Draw notepad background (Nokia green LCD color)
+                    ctx.fillStyle = '#1a3a1a';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Draw notepad border (darker green)
+                    ctx.strokeStyle = '#0f2f0f';
+                    ctx.lineWidth = 3;
+                    ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
+                    
+                    // Draw header bar (darker green)
+                    ctx.fillStyle = '#0f2f0f';
+                    ctx.fillRect(0, 0, canvas.width, 40);
+                    
+                    // Draw header text
+                    ctx.fillStyle = '#00ff00';
+                    ctx.font = '14px monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('NOTEPAD', canvas.width / 2, 25);
+                    
+                    // Draw time in header
+                    ctx.font = '10px monospace';
+                    ctx.textAlign = 'right';
+                    ctx.fillText('10:30', canvas.width - 15, 25);
+                    
+                    // Draw notepad lines
+                    ctx.strokeStyle = '#2a4a2a';
+                    ctx.lineWidth = 1;
+                    
+                    const lineHeight = 20;
+                    const startY = 60;
+                    
+                    for (let y = startY; y < canvas.height - 20; y += lineHeight) {
+                        ctx.beginPath();
+                        ctx.moveTo(20, y);
+                        ctx.lineTo(canvas.width - 20, y);
+                        ctx.stroke();
+                    }
+                    
+                    // Draw note text (green)
+                    ctx.fillStyle = '#00ff00';
+                    ctx.font = '12px monospace';
+                    ctx.textAlign = 'left';
+                    
+                    // Word wrap for long text
+                    const maxWidth = canvas.width - 40;
+                    let y = startY + 5;
+                    
+                    const words = note.split(' ');
+                    let line = '';
+                    
+                    for (let i = 0; i < words.length; i++) {
+                        const testLine = line + words[i] + ' ';
+                        const metrics = ctx.measureText(testLine);
+                        const testWidth = metrics.width;
+                        
+                        if (testWidth > maxWidth && i > 0) {
+                            ctx.fillText(line, 25, y);
+                            line = words[i] + ' ';
+                            y += lineHeight;
+                            
+                            // Stop if we run out of space
+                            if (y > canvas.height - 30) {
+                                ctx.fillText(line + '...', 25, y);
+                                break;
+                            }
+                        } else {
+                            line = testLine;
+                        }
+                    }
+                    
+                    if (y <= canvas.height - 30) {
+                        ctx.fillText(line, 25, y);
+                    }
+                    
+                    // Draw cursor at the end
+                    if (y <= canvas.height - 30) {
+                        const cursorX = 25 + ctx.measureText(line).width;
+                        ctx.fillStyle = '#00ff00';
+                        ctx.fillRect(cursorX, y - 10, 2, 12);
+                    }
+                    
+                    // Draw page number at bottom
+                    ctx.fillStyle = '#2a4a2a';
+                    ctx.font = '10px monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('1/1', canvas.width / 2, canvas.height - 10);
+                    
+                    // Draw Nokia-inspired logo at bottom right
+                    ctx.fillStyle = '#2a4a2a';
+                    ctx.font = '8px monospace';
+                    ctx.textAlign = 'right';
+                    ctx.fillText('NOKIA', canvas.width - 15, canvas.height - 10);
+                    
+                    showNotification('Image generated successfully!');
+                } catch (error) {
+                    console.error('Error generating image:', error);
+                    showNotification('Error generating image. Please try again.');
+                }
+            }
+            
+            function downloadImage() {
+                try {
+                    const link = document.createElement('a');
+                    link.download = 'nokia-notepad.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    
+                    showNotification('Image downloaded successfully!');
+                } catch (error) {
+                    console.error('Error downloading image:', error);
+                    showNotification('Error downloading image. Please try again.');
+                }
+            }
+            
+            function showNotification(message) {
+                notification.textContent = message;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
